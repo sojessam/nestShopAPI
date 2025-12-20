@@ -1,0 +1,20 @@
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: nestshop-db
+    ports:
+      - "5432:5432" 
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: monpassword
+      POSTGRES_DB: nestshop_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+    networks:
+      - nestshop-network
+
+volumes:
+  postgres_data:
+
+networks:
+  nestshop-network:
