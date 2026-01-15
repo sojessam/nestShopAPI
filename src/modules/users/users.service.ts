@@ -24,7 +24,6 @@ export class UsersService {
 
       return result;
     } catch (error) {
-      // @ts-expect-error: Prisma error code
       if (error.code === 'P2002') {
         throw new ConflictException('Email already in use.');
       }
