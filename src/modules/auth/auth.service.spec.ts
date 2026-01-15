@@ -7,6 +7,17 @@ import { AuthService } from './auth.service';
 // Mock argon2
 jest.mock('argon2');
 
+type MockUser = {
+  id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: 'USER' | 'ADMIN';
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
@@ -42,17 +53,19 @@ describe('AuthService', () => {
 
   describe('validateUser', () => {
     it('should return user result if password matches', async () => {
-      const user = {
+      const user: MockUser = {
         id: '1',
         email: 'test@test.com',
         password: 'hashedpassword',
         firstName: 'Test',
         lastName: 'User',
+        role: 'USER',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       const { password, ...result } = user;
 
-      // biome-ignore lint/suspicious/noExplicitAny: Mocking user requires explicit any type casting
-      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(user as any);
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(user);
       (argon2.verify as jest.Mock).mockResolvedValue(true);
 
       expect(await service.validateUser('test@test.com', 'password')).toEqual(result);
@@ -64,13 +77,18 @@ describe('AuthService', () => {
     });
 
     it('should return null if password mismatch', async () => {
-      const user = {
+      const user: MockUser = {
         id: '1',
         email: 'test@test.com',
         password: 'hashedpassword',
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'USER',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
-      // biome-ignore lint/suspicious/noExplicitAny: Mocking user requires explicit any type casting
-      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(user as any);
+
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(user);
       (argon2.verify as jest.Mock).mockResolvedValue(false);
 
       expect(await service.validateUser('test@test.com', 'wrong')).toBeNull();
